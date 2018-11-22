@@ -3,7 +3,7 @@ import { Switch, Route } from 'react-router';
 import routes from './constants/routes';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
-import LoginPage from './containers/Login';
+import LoginPage from './containers/LoginPage';
 
 export default () => (
   <App>

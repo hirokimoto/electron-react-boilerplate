@@ -12,5 +12,5 @@ export function* loginRequest(api, action) {
   // } else {
   //   yield put(AppActions.loginFailure())
   // }
-  yield put(push('/dashboard'))
+  yield put(push('/dashboard'));
 }

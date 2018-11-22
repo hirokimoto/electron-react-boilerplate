@@ -13,19 +13,19 @@ const persistConfig = {
   key: 'root',
   storage,
   blacklist: ['router'],
-  transforms: [immutablePersistenceTransform],
+  transforms: [immutablePersistenceTransform]
 };
 
 const reducers = combineReducers({
   router: connectRouter(history),
-  app: require('./app').reducer,
+  app: require('./app').reducer
 });
 
 const persistedReducer = persistReducer(persistConfig, reducers);
 
 const initialState = {};
 
-const store = configureStore(initialState, persistedReducer, history)
+const store = configureStore(initialState, persistedReducer, history);
 
 const persistor = persistStore(store);
 

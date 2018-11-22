@@ -8,7 +8,5 @@ import { loginRequest } from './app';
 const api = API.create();
 
 export default function* root() {
-  yield all([
-    takeLatest(AppTypes.LOGIN_REQUEST, loginRequest, api),
-  ])
-};
+  yield all([takeLatest(AppTypes.LOGIN_REQUEST, loginRequest, api)]);
+}

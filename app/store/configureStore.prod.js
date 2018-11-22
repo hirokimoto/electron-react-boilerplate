@@ -2,7 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { routerMiddleware, routerActions } from 'connected-react-router';
 import { connectRouter } from 'connected-react-router';
 import createSagaMiddleware from 'redux-saga';
-import rootSaga from '../sagas'
+import rootSaga from '../sagas';
 import * as appActions from '../actions/app';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -22,7 +22,7 @@ const configureStore = (initialState, rootReducer, history) => {
   // Redux DevTools Configuration
   const actionCreators = {
     ...routerActions,
-    ...appActions,
+    ...appActions
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
   /* eslint-disable no-underscore-dangle */
@@ -47,9 +47,9 @@ const configureStore = (initialState, rootReducer, history) => {
 
   store.runSaga = sagaMiddleware.run(rootSaga);
   store.injectedReducers = {};
-  store.injectedSagas = {}
+  store.injectedSagas = {};
 
   return store;
 };
 
-export default { configureStore }
+export default { configureStore };

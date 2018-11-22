@@ -1,18 +1,55 @@
-// @flow
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import { createHashHistory } from 'history';
-import { routerMiddleware } from 'connected-react-router';
-import createRootReducer from '../reducers';
-import type { counterStateType } from '../reducers/types';
+import { createStore, applyMiddleware, compose } from 'redux';
+import { routerMiddleware, routerActions } from 'connected-react-router';
+import { connectRouter } from 'connected-react-router';
+import createSagaMiddleware from 'redux-saga';
+import rootSaga from '../sagas'
+import * as appActions from '../actions/app';
 
-const history = createHashHistory();
-const rootReducer = createRootReducer(history);
-const router = routerMiddleware(history);
-const enhancer = applyMiddleware(thunk, router);
+const sagaMiddleware = createSagaMiddleware();
 
-function configureStore(initialState?: counterStateType) {
-  return createStore(rootReducer, initialState, enhancer);
-}
+const configureStore = (initialState, rootReducer, history) => {
+  // Redux Configuration
+  const middleware = [];
+  const enhancers = [];
 
-export default { configureStore, history };
+  // Saga Middleware
+  middleware.push(sagaMiddleware);
+
+  // Router Middleware
+  const router = routerMiddleware(history);
+  middleware.push(router);
+
+  // Redux DevTools Configuration
+  const actionCreators = {
+    ...routerActions,
+    ...appActions,
+  };
+  // If Redux DevTools Extension is installed use it, otherwise use Redux compose
+  /* eslint-disable no-underscore-dangle */
+  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+        // Options: http://extension.remotedev.io/docs/API/Arguments.html
+        actionCreators
+      })
+    : compose;
+  /* eslint-enable no-underscore-dangle */
+
+  // Apply Middleware & Compose Enhancers
+  enhancers.push(applyMiddleware(...middleware));
+  const enhancer = composeEnhancers(...enhancers);
+
+  // Create Store
+  const store = createStore(
+    connectRouter(history)(rootReducer),
+    initialState,
+    enhancer
+  );
+
+  store.runSaga = sagaMiddleware.run(rootSaga);
+  store.injectedReducers = {};
+  store.injectedSagas = {}
+
+  return store;
+};
+
+export default { configureStore }

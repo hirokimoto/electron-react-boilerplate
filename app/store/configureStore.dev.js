@@ -1,40 +1,18 @@
 import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
-import { createHashHistory } from 'history';
-import { routerMiddleware, routerActions } from 'connected-react-router';
-import { createLogger } from 'redux-logger';
+import { connectRouter, routerMiddleware, routerActions } from 'connected-react-router';
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../sagas'
-import createRootReducer from '../reducers';
 import * as appActions from '../actions/app';
-import type { counterStateType } from '../reducers/types';
-
-const history = createHashHistory();
 
 const sagaMiddleware = createSagaMiddleware();
 
-const rootReducer = createRootReducer(history);
-
-const configureStore = (initialState?: counterStateType) => {
+const configureStore = (initialState, rootReducer, history) => {
   // Redux Configuration
   const middleware = [];
   const enhancers = [];
 
-  // Thunk Middleware
-  middleware.push(thunk);
   // Saga Middleware
   middleware.push(sagaMiddleware);
-
-  // Logging Middleware
-  const logger = createLogger({
-    level: 'info',
-    collapsed: true
-  });
-
-  // Skip redux logs in console during the tests
-  if (process.env.NODE_ENV !== 'test') {
-    middleware.push(logger);
-  }
 
   // Router Middleware
   const router = routerMiddleware(history);
@@ -60,7 +38,11 @@ const configureStore = (initialState?: counterStateType) => {
   const enhancer = composeEnhancers(...enhancers);
 
   // Create Store
-  const store = createStore(rootReducer, initialState, enhancer);
+  const store = createStore(
+    connectRouter(history)(rootReducer),
+    initialState,
+    enhancer
+  );
 
   store.runSaga = sagaMiddleware.run(rootSaga);
   store.injectedReducers = {};
@@ -70,7 +52,9 @@ const configureStore = (initialState?: counterStateType) => {
     module.hot.accept(
       '../reducers',
       // eslint-disable-next-line global-require
-      () => store.replaceReducer(require('../reducers').default)
+      () => {
+        store.replaceReducer(connectRouter(history)(rootReducer))
+      }
     );
 
     const newYieldedSagas = require('../sagas').default;
@@ -83,4 +67,4 @@ const configureStore = (initialState?: counterStateType) => {
   return store;
 };
 
-export default { configureStore, history };
+export default { configureStore }

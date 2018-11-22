@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { ConnectedRouter } from 'connected-react-router';
+import { PersistGate } from 'redux-persist/integration/react';
+import { ConnectedRouter } from 'connected-react-router/immutable';
 import type { Store } from '../reducers/types';
 import Routes from '../Routes';
 
@@ -12,12 +13,14 @@ type Props = {
 
 export default class Root extends Component<Props> {
   render() {
-    const { store, history } = this.props;
+    const { store, history, persistor } = this.props;
     return (
       <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <Routes />
-        </ConnectedRouter>
+        <PersistGate persistor={persistor}>
+          <ConnectedRouter history={history}>
+            <Routes />
+          </ConnectedRouter>
+        </PersistGate>
       </Provider>
     );
   }

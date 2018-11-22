@@ -3,11 +3,16 @@ import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
+import createSagaMiddleware from 'redux-saga';
+import rootSaga from '../sagas'
 import createRootReducer from '../reducers';
 import * as counterActions from '../actions/counter';
+import * as appActions from '../actions/app';
 import type { counterStateType } from '../reducers/types';
 
 const history = createHashHistory();
+
+const sagaMiddleware = createSagaMiddleware();
 
 const rootReducer = createRootReducer(history);
 
@@ -18,6 +23,8 @@ const configureStore = (initialState?: counterStateType) => {
 
   // Thunk Middleware
   middleware.push(thunk);
+  // Saga Middleware
+  middleware.push(sagaMiddleware);
 
   // Logging Middleware
   const logger = createLogger({
@@ -37,7 +44,8 @@ const configureStore = (initialState?: counterStateType) => {
   // Redux DevTools Configuration
   const actionCreators = {
     ...counterActions,
-    ...routerActions
+    ...routerActions,
+    ...appActions,
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
   /* eslint-disable no-underscore-dangle */
@@ -56,12 +64,22 @@ const configureStore = (initialState?: counterStateType) => {
   // Create Store
   const store = createStore(rootReducer, initialState, enhancer);
 
+  store.runSaga = sagaMiddleware.run(rootSaga);
+  store.injectedReducers = {};
+  store.injectedSagas = {}
+
   if (module.hot) {
     module.hot.accept(
       '../reducers',
       // eslint-disable-next-line global-require
       () => store.replaceReducer(require('../reducers').default)
     );
+
+    const newYieldedSagas = require('../sagas').default;
+    store.runSaga.cancel();
+    store.runSaga.done.then(() => {
+      store.runSaga = sagaMiddleware.run(newYieldedSagas);
+    });
   }
 
   return store;

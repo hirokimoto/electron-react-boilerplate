@@ -193,7 +193,6 @@
     "babel-plugin-transform-react-remove-prop-types": "^0.4.20",
     "chalk": "^2.4.1",
     "concurrently": "^4.1.0",
-    "connected-react-router": "^5.0.1",
     "cross-env": "^5.2.0",
     "cross-spawn": "^6.0.5",
     "css-loader": "^1.0.1",
@@ -256,6 +255,8 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.5.0",
+    "apisauce": "^1.0.0",
+    "connected-react-router": "^5.0.1",
     "devtron": "^1.4.0",
     "electron-debug": "^2.0.0",
     "electron-log": "^2.2.17",
@@ -268,7 +269,11 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.1",
+    "redux-persist": "^5.10.0",
+    "redux-saga": "^0.16.2",
     "redux-thunk": "^2.3.0",
+    "reduxsauce": "^1.0.0",
+    "seamless-immutable": "^7.1.4",
     "source-map-support": "^0.5.9"
   },
   "devEngines": {

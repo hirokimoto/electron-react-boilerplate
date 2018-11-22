@@ -6,7 +6,6 @@ import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../sagas'
 import createRootReducer from '../reducers';
-import * as counterActions from '../actions/counter';
 import * as appActions from '../actions/app';
 import type { counterStateType } from '../reducers/types';
 
@@ -43,7 +42,6 @@ const configureStore = (initialState?: counterStateType) => {
 
   // Redux DevTools Configuration
   const actionCreators = {
-    ...counterActions,
     ...routerActions,
     ...appActions,
   };
